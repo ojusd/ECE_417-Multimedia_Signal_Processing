@@ -1,0 +1,61 @@
+function [features, N] = pca(rawImgMat)
+
+    meanImg = mean(rawImgMat,2);
+    pcaImgMat = bsxfun(@minus,rawImgMat,meanImg);
+   
+    % COMPUTE SCATTER MATRIX
+    scatMat = (1/(79))*(pcaImgMat'*pcaImgMat);
+    [V,D] = eig(scatMat);
+    
+    eigvals = diag(D);
+    [sorted_eigenvalues,sorted_index] = sort(eigvals,'descend');
+    csum = cumsum(sorted_eigenvalues);
+    energy = max(csum);
+    %disp(energy);
+    N = find(csum >= energy*0.95,1);
+    
+    %disp(N);
+    
+    V1 = zeros(80,N);
+     for i=1:N
+        V1(:,i) = V(:,sorted_index(i,1));
+     end
+     
+    discLength = 80 - N;
+    discarded = zeros(80,discLength);
+    x=1;
+    for i=N+1:80
+        discarded(:,x) = D(:,sorted_index(i,1));
+        x=x+1;
+    end
+    %disp(D);
+    %[o,j] = size(V1);
+    %disp(o);
+    %disp(j);
+    %Y = V1'*scatMat;
+    
+    %Y2 = pcaImgMat'*V*(D.^(1/2));
+    %[o,j] = size(Y);
+    %disp(o);
+    %disp(j);
+    %Xhat = bsxfun(@plus,V1*Y,meanImg);
+    %[o,j] = size(pcaImgMat);
+    %disp(o);
+    %disp(j);
+    %est_error = sum(sum(abs(rawImgMat-Xhat).^2,1))/(79);
+    %true_error = sum(sum(discarded));
+    %disp(est_error); % <-- Same! yay.
+    %disp(true_error);% <----^
+    %U = (V1'*inv(D.^(1/2)))*pcaImgMat;
+    U = (V1'*scatMat)*inv(D.^(1/2));
+    H = 
+    %U2 = ((V1'*inv(D.^(1/2))))*pcaImgMat';
+    %U =U2*pcaImgMat;
+    %[o,j] = size(U);
+    %disp(o);
+    %disp(j);
+    %[V2,D2] = eigs(U2,80);
+    features = U;
+    %disp(features);
+    
+end
